@@ -3,6 +3,8 @@ const exphbs = require('express-handlebars')
 const methodOverride = require('method-override')
 const bcrypt = require('bcryptjs')
 const session = require('express-session')
+const passport = require('passport')
+const usePassport = require('./config/passport')
 
 const app = express()
 const PORT = 3000
@@ -19,6 +21,7 @@ app.use(session({
   resave: false,
   saveUninitialzed: true
 }))
+usePassport(app)
 
 //首頁
 app.get('/', (req, res) => {
@@ -44,9 +47,11 @@ app.get('/users/login', (req, res) => {
 })
 
 //登入檢查
-app.post('/users/login', (req, res) => {
-  res.send('login')
+app.post('/users/login', passport.authenticate('local',{
+  successRedirect: '/',
+  failureRedirect: '/users/login'
 })
+)
 
 //註冊
 app.get('/users/register', (req, res) => {
