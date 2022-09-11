@@ -26,14 +26,6 @@ usePassport(app)
 app.use(routes)
 
 //首頁
-app.get('/', (req, res) => {
-  return Todo.findAll({
-    raw: true,
-    nest: true
-  })
-    .then((todos) => { return res.render('index', { todos }) })
-    .catch((error) => { return res.status(422).json(error) })
-})
 
 //詳細
 app.get('/todos/:id', (req, res) => {
