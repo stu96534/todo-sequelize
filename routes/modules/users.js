@@ -26,7 +26,6 @@ router.post('/register', (req, res) => {
   const errors = []
 
   if (!name || !email || !password || !confirmPassword) {
-    console.log(confirmPassword)
     errors.push({ message: '所有欄位都是必填。' })
   }
 
