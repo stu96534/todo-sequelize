@@ -8,6 +8,7 @@ const usePassport = require('./config/passport')
 
 const app = express()
 const PORT = 3000
+const routes = require('./routes')
 const db = require('./models')
 const Todo = db.Todo
 const User = db.User
@@ -22,6 +23,7 @@ app.use(session({
   saveUninitialzed: true
 }))
 usePassport(app)
+app.use(routes)
 
 //首頁
 app.get('/', (req, res) => {
@@ -39,58 +41,6 @@ app.get('/todos/:id', (req, res) => {
   return Todo.findByPk(id)
     .then(todo => res.render('detail', { todo: todo.toJSON() }))
     .catch(error => console.log(error))
-})
-
-//登入
-app.get('/users/login', (req, res) => {
-  res.render('login')
-})
-
-//登入檢查
-app.post('/users/login', passport.authenticate('local',{
-  successRedirect: '/',
-  failureRedirect: '/users/login'
-})
-)
-
-//註冊
-app.get('/users/register', (req, res) => {
-  res.render('register')
-})
-
-//註冊檢查
-app.post('/users/register', (req, res) => {
-  const { name, email, password, confirmPassword } = req.body
-  User.findOne({ where: { email } }).then(user => {
-    if (user) {
-      console.log('User already exists')
-      return res.render('register', {
-        name,
-        email,
-        password,
-        confirmPassword
-      })
-    }
-
-    return bcrypt
-      .genSalt(10)
-      .then(salt => bcrypt.hash(password, salt))
-      .then(hash =>
-        User.create({
-          name,
-          email,
-          password: hash
-        })
-      )
-      .then(() => res.redirect('/'))
-      .catch(err => console.log(err))
-  })
-
- 
-})
-
-app.post('/users/logout', (req, res) => {
-  res.send('logout')
 })
 
 app.listen(PORT, () => {
