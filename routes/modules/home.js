@@ -3,18 +3,24 @@ const router = express.Router()
 
 const db = require('../../models')
 const Todo = db.Todo
+const User = db.User
 
 router.get('/', (req, res) => {
-  const userId = req.user._id
-  return Todo.findAll({ where: { userId },
-    raw: true,
-    nest: true
-})
-    .sort({ _id: 'asc' })
-    .then(todos => { return res.render('index', { todos }) })
-    .catch((error) => { return res.status(422).json(error) })
+  const UserId = req.user.id
+  User.findByPk(UserId)
+    .then((user) => {
+      if (!user) throw new Error('user not found')
+
+      return Todo.findAll({
+        raw: true,
+        nest: true,
+        where: { UserId },
+      })
+        .then(todos => { return res.render('index', { todos }) })
+        .catch((error) => { return res.status(422).json(error) })
+
+    })
+
 })
 
 module.exports = router
-
-
